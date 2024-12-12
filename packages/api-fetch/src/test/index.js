@@ -288,4 +288,62 @@ describe( 'apiFetch', () => {
 
 		apiFetch( expectedOptions );
 	} );
+
+	it( 'should allow DELETE, PUT, and PATCH methods after removing httpV1Middleware', () => {
+		// Create a spy for window.fetch
+		window.fetch.mockReturnValue(
+			Promise.resolve( {
+				status: 200,
+				json: () => Promise.resolve( {} ),
+			} )
+		);
+
+		// Remove HTTP v1 middleware
+		apiFetch.removeHttpV1Middleware();
+
+		// Test DELETE method
+		apiFetch( {
+			path: '/wp/v2/posts/1',
+			method: 'DELETE',
+		} );
+
+		expect( window.fetch ).toHaveBeenCalledWith(
+			'/wp/v2/posts/1?_locale=user',
+			expect.objectContaining( {
+				method: 'DELETE',
+			} )
+		);
+
+		// Test PUT method
+		window.fetch.mockClear();
+		apiFetch( {
+			path: '/wp/v2/posts/1',
+			method: 'PUT',
+			data: { title: 'Updated Post' },
+		} );
+
+		expect( window.fetch ).toHaveBeenCalledWith(
+			'/wp/v2/posts/1?_locale=user',
+			expect.objectContaining( {
+				method: 'PUT',
+				body: JSON.stringify( { title: 'Updated Post' } ),
+			} )
+		);
+
+		// Test PATCH method
+		window.fetch.mockClear();
+		apiFetch( {
+			path: '/wp/v2/posts/1',
+			method: 'PATCH',
+			data: { status: 'draft' },
+		} );
+
+		expect( window.fetch ).toHaveBeenCalledWith(
+			'/wp/v2/posts/1?_locale=user',
+			expect.objectContaining( {
+				method: 'PATCH',
+				body: JSON.stringify( { status: 'draft' } ),
+			} )
+		);
+	} );
 } );
