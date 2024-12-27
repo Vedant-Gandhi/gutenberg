@@ -255,7 +255,7 @@ const withBlockTree =
 		const newState = reducer( state, action );
 
 		if ( newState === state ) {
-			return state;
+			return { ...state };
 		}
 
 		newState.tree = state.tree ? state.tree : new Map();
@@ -452,7 +452,7 @@ function withPersistentBlockChange( reducer ) {
 		if ( explicitPersistent !== undefined ) {
 			nextIsPersistentChange = explicitPersistent;
 			return nextIsPersistentChange === nextState.isPersistentChange
-				? nextState
+				? { ...nextState }
 				: {
 						...nextState,
 						isPersistentChange: nextIsPersistentChange,
@@ -471,7 +471,7 @@ function withPersistentBlockChange( reducer ) {
 
 			nextIsPersistentChange = state?.isPersistentChange ?? true;
 			if ( state.isPersistentChange === nextIsPersistentChange ) {
-				return state;
+				return { ...state };
 			}
 
 			return {
@@ -494,7 +494,7 @@ function withPersistentBlockChange( reducer ) {
 		markNextChangeAsNotPersistent =
 			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 
-		return nextState;
+		return { ...nextState };
 	};
 }
 
